@@ -23,9 +23,9 @@ void client_thread(int client_socket, vector<int>& clients, const string& userna
         if (bytes_received == 0) {
             mtx.lock();
             cout << "Client " << username << " disconnected" << endl;
-            mtx.unlock();
             // Remove client from the list
             clients.erase(remove(clients.begin(), clients.end(), client_socket), clients.end());
+            mtx.unlock();
             break;
         }
         // message is already binded with username
@@ -93,8 +93,10 @@ int main() {
         }
         string username = string(buffer, bytes_received);
 
+        mtx.lock();
         // Add the client to the list
         clients.push_back(client_socket);
+        mtx.unlock();
 
         // Create a thread to handle the client
         thread t(client_thread, client_socket, ref(clients), username);
